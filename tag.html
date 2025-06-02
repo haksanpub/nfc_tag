@@ -62,41 +62,64 @@
         <p>사용하시는 기기에 맞는 다운로드 버튼을 클릭해주세요.</p>
 
         <p>다운로드 전 이미지를 미리 볼 수 있습니다:</p>
-        <img src="https://raw.githubusercontent.com/haksanpub/nfc_tag/main/preview_image.jpg" alt="미리보기 이미지">
-
-        <div id="android-download-box" class="download-box hidden">
+        <img id="previewImage" src="" alt="미리보기 이미지"> <div id="android-download-box" class="download-box hidden">
             <h2><span role="img" aria-label="Android Icon">🤖</span> 안드로이드 사용자용</h2>
             <p>아래 버튼을 클릭하여 안드로이드용 이미지를 다운로드할 수 있습니다.</p>
-            <a href="https://raw.githubusercontent.com/haksanpub/nfc_tag/main/android_image.jpg" class="download-button" download>안드로이드 이미지 다운로드</a>
-        </div>
+            <a id="androidDownloadLink" href="" class="download-button" download>안드로이드 이미지 다운로드</a> </div>
 
         <div id="ios-download-box" class="download-box hidden">
             <h2><span role="img" aria-label="iOS Icon">🍎</span> 아이폰 (iOS) 사용자용</h2>
             <p>아래 버튼을 클릭하여 아이폰용 이미지를 다운로드할 수 있습니다.</p>
-            <a href="https://raw.githubusercontent.com/haksanpub/nfc_tag/main/iphone_image.jpg" class="download-button ios" download>아이폰 이미지 다운로드</a>
-        </div>
+            <a id="iosDownloadLink" href="" class="download-button ios" download>아이폰 이미지 다운로드</a> </div>
     </div>
 
     <script>
-        // 사용자 에이전트(User Agent) 문자열을 통해 OS 감지
+        // GitHub Pages의 기본 URL을 설정합니다.
+        // [사용자이름]과 [저장소이름]은 실제 값으로 변경해야 합니다.
+        const githubPagesBaseUrl = "https://haksanpub.github.io/nfc_tag/"; 
+        
+        // 현재 날짜를 가져와 월을 파악합니다 (0부터 시작하므로 +1 필요)
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1; // 1월은 1, 2월은 2 ... 12월은 12
+        
+        // 월별 이미지 파일명을 만듭니다 (예: 1월이면 '01_image.jpg')
+        // 월이 한 자리 숫자일 경우 앞에 '0'을 붙여 두 자리로 만듭니다 (예: '01', '02')
+        const monthString = currentMonth < 10 ? '0' + currentMonth : currentMonth;
+
+        // 이미지 파일명 패턴을 정의합니다. (예: 01_preview.jpg, 01_android.jpg, 01_iphone.jpg)
+        // **이 파일명들은 GitHub 저장소에 실제로 업로드된 이미지 파일명과 일치해야 합니다.**
+        const previewImageFileName = `${monthString}_preview.jpg`;
+        const androidImageFileName = `${monthString}_android.jpg`;
+        const iosImageFileName = `${monthString}_iphone.jpg`;
+
+        // 각 이미지의 전체 URL을 생성합니다.
+        const previewImageUrl = githubPagesBaseUrl + previewImageFileName;
+        const androidImageUrl = githubPagesBaseUrl + androidImageFileName;
+        const iosImageUrl = githubPagesBaseUrl + iosImageFileName;
+
+        // HTML 요소들을 가져옵니다.
+        const previewImageElement = document.getElementById('previewImage');
+        const androidDownloadLink = document.getElementById('androidDownloadLink');
+        const iosDownloadLink = document.getElementById('iosDownloadLink');
+
+        // 이미지 미리보기와 다운로드 링크를 설정합니다.
+        previewImageElement.src = previewImageUrl;
+        androidDownloadLink.href = androidImageUrl;
+        iosDownloadLink.href = iosImageUrl;
+
+        // ---- 기존의 OS 감지 로직 (이 부분은 동일하게 유지됩니다) ----
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
         const androidBox = document.getElementById('android-download-box');
         const iosBox = document.getElementById('ios-download-box');
 
         if (/android/i.test(userAgent)) {
-            // 안드로이드 기기
             androidBox.classList.remove('hidden');
         } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-            // 아이폰/아이패드/아이팟 터치 기기 (MSStream은 IE/Edge에서 iPad 문자열이 나올 수 있어 제외)
             iosBox.classList.remove('hidden');
         } else {
-            // 그 외의 기기 (PC 등) - 필요에 따라 둘 다 보이게 하거나 메시지 표시
-            androidBox.classList.remove('hidden'); // 기본적으로 안드로이드 버튼을 보여줌
-            iosBox.classList.remove('hidden');     // 기본적으로 iOS 버튼도 보여줌
-            // 아니면 특정 메시지를 표시할 수도 있습니다:
-            // const messageBox = document.createElement('div');
-            // messageBox.innerHTML = '<p>사용하시는 기기에 맞는 버튼을 선택해주세요.</p>';
-            // document.querySelector('.container').insertBefore(messageBox, androidBox);
+            // PC 등 기타 기기에서는 둘 다 보이게 함
+            androidBox.classList.remove('hidden');
+            iosBox.classList.remove('hidden');
         }
     </script>
 </body>
