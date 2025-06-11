@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이미지 다운로드</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #007bff; margin-bottom: 20px; }
+        p { line-height: 1.6; margin-bottom: 20px; }
+        .download-box {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background-color: #e9e9e9;
+            text-align: left;
+        }
+        .download-box h2 {
+            margin-top: 0;
+            color: #555;
+            font-size: 1.3em;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .download-button {
+            display: block;
+            width: 100%;
+            padding: 15px 0;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            margin-top: 15px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .download-button.ios {
+            background-color: #007bff;
+        }
+        .download-button:hover {
+            opacity: 0.9;
+        }
+        img {
+            max-width: 90%;
+            height: auto;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>이미지를 다운로드하세요!</h1>
+        <p>사용하시는 기기에 맞는 다운로드 버튼을 클릭해주세요.</p>
+
+        <p>다운로드 전 이미지를 미리 볼 수 있습니다:</p>
+        <img id="previewImage" src="" alt="미리보기 이미지">
+
+        <div id="android-download-box" class="download-box hidden">
+            <h2><span role="img" aria-label="Android Icon">🤖</span> 안드로이드 사용자용</h2>
+            <p>아래 버튼을 클릭하여 안드로이드용 이미지를 다운로드할 수 있습니다.</p>
+            <a id="androidDownloadLink" href="" class="download-button" download>안드로이드 이미지 다운로드</a>
+        </div>
+
+        <div id="ios-download-box" class="download-box hidden">
+            <h2><span role="img" aria-label="iOS Icon">🍎</span> 아이폰 (iOS) 사용자용</h2>
+            <p>아래 버튼을 클릭하여 아이폰용 이미지를 다운로드할 수 있습니다.</p>
+            <a id="iosDownloadLink" href="" class="download-button ios" download>아이폰 이미지 다운로드</a>
+        </div>
+    </div>
+
+    <script>
+        const githubPagesBaseUrl = "https://haksanpub.github.io/nfc_tag/";
+
+        // 현재 날짜를 가져옵니다.
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1; // 1월은 1, 2월은 2 ... 12월은 12
+        const currentDay = currentDate.getDate();
+
+        // 해당 월의 첫 번째 날을 가져옵니다.
+        const firstDayOfMonth = new Date(currentYear, currentDate.getMonth(), 1);
+        // 해당 월의 첫 번째 요일 (0: 일요일, 1: 월요일, ..., 6: 토요일)
+        const firstDayOfWeek = firstDayOfMonth.getDay();
+
+        // 현재 날짜가 해당 월의 몇 번째 주차인지 계산합니다.
+        // 해당 주차를 계산하는 로직입니다.
+        // 첫째 주 시작일 조정 (일요일이 주의 시작일이라고 가정)
+        let dayAdjust = firstDayOfWeek === 0 ? 0 : 7 - firstDayOfWeek; // 월요일이 주의 시작일이라면 dayAdjust를 0으로 설정
+        let weekNumber = Math.ceil((currentDay + dayAdjust) / 7);
+
+        // 월이 한 자리 숫자일 경우 앞에 '0'을 붙여 두 자리로 만듭니다 (예: '01', '02')
+        const monthString = currentMonth < 10 ? '0' + currentMonth : currentMonth;
+
+        // 이미지 파일명 패턴을 정의합니다. (예: 2025_06_1_preview.jpg, 2025_06_1_android.jpg, 2025_06_1_iphone.jpg)
+        // **이 파일명들은 GitHub 저장소에 실제로 업로드된 이미지 파일명과 일치해야 합니다.**
+        const previewImageFileName = `${currentYear}_${monthString}_${weekNumber}_preview.jpg`;
+        const androidImageFileName = `${currentYear}_${monthString}_${weekNumber}_android.jpg`;
+        const iosImageFileName = `${currentYear}_${monthString}_${weekNumber}_iphone.jpg`;
+
+        // 각 이미지의 전체 URL을 생성합니다.
+        const previewImageUrl = githubPagesBaseUrl + previewImageFileName;
+        const androidImageUrl = githubPagesBaseUrl + androidImageFileName;
+        const iosImageUrl = githubPagesBaseUrl + iosImageFileName;
+
+        // HTML 요소들을 가져옵니다.
+        const previewImageElement = document.getElementById('previewImage');
+        const androidDownloadLink = document.getElementById('androidDownloadLink');
+        const iosDownloadLink = document.getElementById('iosDownloadLink');
+
+        // 이미지 미리보기와 다운로드 링크를 설정합니다.
+        previewImageElement.src = previewImageUrl;
+        androidDownloadLink.href = androidImageUrl;
+        iosDownloadLink.href = iosImageUrl;
+
+        // ---- 기존의 OS 감지 로직 (이 부분은 동일하게 유지됩니다) ----
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        const androidBox = document.getElementById('android-download-box');
+        const iosBox = document.getElementById('ios-download-box');
+
+        if (/android/i.test(userAgent)) {
+            androidBox.classList.remove('hidden');
+        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            iosBox.classList.remove('hidden');
+        } else {
+            // PC 등 기타 기기에서는 둘 다 보이게 함
+            androidBox.classList.remove('hidden');
+            iosBox.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
